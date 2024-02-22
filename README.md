@@ -1,3 +1,5 @@
+how to create a virtual environment for the diffrenet scripts:
+
 ### Step 1: Install Anaconda
 
 Download and install Anaconda from the [official website](https://www.anaconda.com/products/individual) to ensure you have all the necessary tools and packages to run this application.
@@ -25,7 +27,7 @@ conda activate {name_of_the_sscript}_venv
 conda deactivate
 ```
 
-### for delete the environment
+### delete the environment
 
 deactivate the environment and then run the following command
 ```bash

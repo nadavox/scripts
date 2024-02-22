@@ -6,13 +6,18 @@ pip install PyPDF2
 
 open the terminal or command prompt.
 run the script by providing the path to the PDF file,
-the number of pages per batch and output directory as command-line arguments:
+the number of pages per batch, and output directory as command-line arguments:
 python splitPDF.py path_to_pdf pages_per_batch output_dir
 
 For example, to split a PDF file named input.pdf into batches of 10 pages each and save the output files to a directory named output_dir,
 you would run the following command:
 python splitPDF.py input.pdf 10 output_dir
 
+NOTES:
+The output directory will be created if it doesn't exist.
+The output files will be named input_batch_1.pdf, input_batch_2.pdf, and so on.
+The output directory will be saved in the directory where the script is running.
+The PDF file should be in the same directory where the script is running.
 '''
 import PyPDF2
 import sys
@@ -60,12 +65,24 @@ def split_pdf_to_batches(pdf_path, pages_per_batch, output_dir):
 
 # Example usage:
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python split_pdf.py <path_to_pdf> <pages_per_batch> <output_dir>")
-        sys.exit(1)
+    try:
+        if len(sys.argv) != 4:
+            raise ValueError("Invalid number of arguments. Please provide <pdf file>, <pages per batch>, and <output_dir>.")
 
-    pdf_file_path = sys.argv[1]
-    batch_size = int(sys.argv[2])
-    output_directory = sys.argv[3]
+        pdf_file_path = sys.argv[1]
+        batch_size = int(sys.argv[2])
+        output_directory = sys.argv[3]
 
-    split_pdf_to_batches(pdf_file_path, batch_size, output_directory)
+        if not os.path.exists(pdf_file_path):
+            raise FileNotFoundError(f"The file {pdf_file_path} does not exist.")
+
+        if batch_size <= 0:
+            raise ValueError("Pages per batch must be a positive integer.")
+
+        split_pdf_to_batches(pdf_file_path, batch_size, output_directory)
+    
+    except ValueError as ve:
+        print(f"Error: {ve}\n enter a number of pages per batch.")
+    
+    except FileNotFoundError as fe:
+        print(f"Error: {fe}")

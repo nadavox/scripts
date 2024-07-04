@@ -1,6 +1,9 @@
+from pathlib import Path
 from pydub import AudioSegment
 from pydub.silence import detect_silence
 import os
+
+root = os.path.dirname(os.path.abspath(__file__))
 
 def find_nearest_silence(audio, target_position, min_silence_len=500, silence_thresh=-30):
     # Search for silence around the target position
@@ -18,7 +21,7 @@ def find_nearest_silence(audio, target_position, min_silence_len=500, silence_th
     # Find the nearest silence
     nearest_silence = min(silent_ranges, key=lambda x: abs((x[0] + x[1])/2 - (target_position - start)))
     return start + (nearest_silence[0] + nearest_silence[1]) // 2
-
+ 
 def cut_ogg_in_thirds(input_file, output_files):
     # Load the OGG file
     audio = AudioSegment.from_ogg(input_file)
@@ -43,16 +46,25 @@ def cut_ogg_in_thirds(input_file, output_files):
     second_part = audio[actual_first_cut:actual_second_cut]
     third_part = audio[actual_second_cut:]
 
+    temp_dir = "/Users/nadavox/Desktop/test_for_grock_audio_to_text/"
+
     # Export the parts
     for i, part in enumerate([first_part, second_part, third_part]):
-        part.export(output_files[i], format="ogg")
-        print(f"Part {i+1} saved as {output_files[i]} (duration: {len(part)/1000:.2f} seconds)")
+        path = f'{temp_dir}_{i+1}.ogg'
+        part.export(path, format="ogg")
+        print(f"Part {i+1} saved as {path} (duration: {len(part)/1000:.2f} seconds)")
 
     print(f"Audio file cut into thirds.")
 
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description="Convert an OGG audio file into words.")
+    parser.add_argument("input_file", help="Path to the input OGG audio file.")
+    parser.add_argument("output_file", help="Paths to save the conclution of the audio file.")
+    return parser.parse_args()
 
 if __name__ == "__main__":
-
+    from convert_to_mp4 import convert_to_ogg
     # Example usage
     input_file = "/Users/nadavox/Desktop/test_for_grock_audio_to_text/safe_programing_L1.ogg"
     output_files = [
@@ -60,5 +72,7 @@ if __name__ == "__main__":
         "/Users/nadavox/Desktop/test_for_grock_audio_to_text/safe_programing_L1_part2.ogg",
         "/Users/nadavox/Desktop/test_for_grock_audio_to_text/safe_programing_L1_part3.ogg"
     ]
+
+    convert_to_ogg(input_file, input_file)
 
     cut_ogg_in_thirds(input_file, output_files)

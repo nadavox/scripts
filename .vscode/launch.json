@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File",
-            "type": "debugpy",
+            "name": "Python: Current File",
+            "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "python": "/Users/nadavox/anaconda3/envs/script_split_audio_venv/bin/python"
+            "args": ["-f", "C:\\Users\\adida\\OneDrive\\nadav_project\\input.json", "-o", "C:\\Users\\adida\\OneDrive\\nadav_project"]
         }
     ]
 }

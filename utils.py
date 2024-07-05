@@ -1,3 +1,4 @@
+from pathlib import Path
 from pydub import AudioSegment
 from pydub.silence import detect_silence
 import os
@@ -22,46 +23,36 @@ def find_nearest_silence(audio, target_position, min_silence_len=500, silence_th
     nearest_silence = min(silent_ranges, key=lambda x: abs((x[0] + x[1])/2 - (target_position - start)))
     return start + (nearest_silence[0] + nearest_silence[1]) // 2
 
-def cut_ogg_in_thirds(courses, output_path):
+
+def split_audio(audio, segment_length_ms = 200000):
+    # Get the duration of the audio in milliseconds
+    num_segments = len(audio) // segment_length_ms + 1
+    parts = []
+    # Split the audio into segments
+    start_time = 0
+    for i in range(num_segments):
+        end_time = (i + 1) * segment_length_ms
+        actual_end_time = find_nearest_silence(audio, end_time)
+        segment = audio[start_time:actual_end_time]
+        start_time = actual_end_time
+        parts.append(segment)
+
+    return parts
+
+
+def convert_video_to_audio(courses):
     for course, in_path in courses.items():
-        # Count the number of lectures
-        num_of_lectures = len(os.listdir(in_path))
-        output_course = f'{output_path}\out_{course}'
-        # Create a new directory
-        os.makedirs(output_course)
-        for i in range(num_of_lectures):
-            in_cur_file = f'{in_path}\_{i+1}.mp4'
-            audio = AudioSegment.from_file(in_cur_file, format="mp4")
-
-            # Get the duration of the audio in milliseconds
-            duration = len(audio)
-
-            # Calculate the ideal cut points
-            first_cut = duration // 3
-            second_cut = 2 * duration // 3
-
-            # Find the nearest silence for each cut point
-            actual_first_cut = find_nearest_silence(audio, first_cut)
-            actual_second_cut = find_nearest_silence(audio, second_cut)
-
-            # Ensure the cuts are different
-            if abs(actual_first_cut - actual_second_cut) < 1000:  # If cuts are within 1 second
-                actual_second_cut = second_cut  # Revert to original cut point
-
-            # Cut the audio into thirds
-            first_part = audio[:actual_first_cut]
-            second_part = audio[actual_first_cut:actual_second_cut]
-            third_part = audio[actual_second_cut:]
-
+        for file_path in Path(in_path).iterdir():
+            if file_path.is_file() and file_path.suffix.lower() in ['.mp4', '.mp3', '.ogg', '.flac', '.m4a', '.aac', '.wav']:
+                audio = AudioSegment.from_file(str(file_path))
+            else: continue # when the file is not lecture
+            
+            parts = split_audio(audio)
             # Export the parts
-            for i, part in enumerate([first_part, second_part, third_part]):
-                out_cur_file = f'{output_course}\_{i+1}.wav'
+            for i, part in enumerate(parts):
+                out_cur_file = f'{in_path}\{file_path.stem}_{i+1}.wav'
                 part.export(out_cur_file, format="wav")
                 print(f"Part {i+1} saved as {out_cur_file} (duration: {len(part)/1000:.2f} seconds)")
-
-            print(f"Audio file cut into thirds.")
-
-            print(f"Audio file cut into thirds.")
 
 
 def parser_json(json_file):

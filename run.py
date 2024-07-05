@@ -1,4 +1,4 @@
-from utils import cut_ogg_in_thirds, parser_json
+from utils import convert_video_to_audio, parser_json
 
 courses = {}
 
@@ -22,4 +22,4 @@ if __name__ == "__main__":
 
     courses = parser_json(input_json)
 
-    cut_ogg_in_thirds(courses, output_path)
+    convert_video_to_audio(courses)

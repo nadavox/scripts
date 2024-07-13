@@ -8,9 +8,8 @@ Download and install Anaconda from the [official website](https://www.anaconda.c
 
 Open your terminal or command prompt and create a new virtual environment specifically for this project by running:
 
-
 ```bash
-conda create --name script_{name_of_the_sscript}_venv python=3.12
+conda create --name script_{name_of_the_sscript}_venv python=3.11
 ```
 
 This command creates a new Conda environment named `script_{name_of_the_sscript}_venv` with Python 3.11.
